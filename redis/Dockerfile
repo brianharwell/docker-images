@@ -1,18 +1,14 @@
-# ARG build=mcr.microsoft.com/powershell:nanoserver-1803
-# ARG runtime=mcr.microsoft.com/windows/nanoserver:1803
+ARG redis_version=3.2.100
 
-ARG build=mcr.microsoft.com/powershell:nanoserver-1709
-ARG runtime=mcr.microsoft.com/windows/nanoserver:1709
-
-FROM ${build} as build
+FROM mcr.microsoft.com/powershell:nanoserver-1809 as build
 
 SHELL ["pwsh.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-RUN Invoke-WebRequest -Uri "https://github.com/microsoftarchive/redis/releases/download/win-3.2.100/Redis-x64-3.2.100.zip" -OutFile redis.zip -UseBasicParsing; ` \
+RUN Invoke-WebRequest -Uri $("https://github.com/microsoftarchive/redis/releases/download/win-{0}/Redis-x64-{0}.zip" -f ${redis_version}) -OutFile redis.zip -UseBasicParsing; ` \
     Expand-Archive -Path redis.zip -DestinationPath redis;
 
 
-FROM ${runtime} as runtime
+FROM mcr.microsoft.com/windows/nanoserver:1809 as runtime
 
 LABEL Description="Redis on Windows"
 
